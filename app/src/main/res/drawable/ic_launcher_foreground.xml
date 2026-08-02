@@ -1,0 +1,31 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Sun rays -->
+    <path
+        android:fillColor="#FFD54F"
+        android:pathData="M54,22 L54,16 M32,32 L27,27 M76,32 L81,27 M22,54 L16,54 M86,54 L92,54"
+        android:strokeWidth="3.5"
+        android:strokeColor="#FFD54F"
+        android:strokeLineCap="round"/>
+    <!-- Sun circle -->
+    <path
+        android:fillColor="#FFCA28"
+        android:pathData="M54,32 A10,10 0 1,1 54,52 A10,10 0 1,1 54,32 Z"/>
+    <!-- Leaf shape -->
+    <path
+        android:fillColor="#81C784"
+        android:pathData="M54,42 C30,52 30,82 54,88 C78,82 78,52 54,42 Z"/>
+    <path
+        android:fillColor="#4CAF50"
+        android:pathData="M54,42 C54,58 54,78 54,88 C78,82 78,52 54,42 Z"/>
+    <!-- Leaf vein -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#2E7D32"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:pathData="M54,46 L54,84 M54,58 L44,52 M54,66 L64,60 M54,74 L46,70"/>
+</vector>
