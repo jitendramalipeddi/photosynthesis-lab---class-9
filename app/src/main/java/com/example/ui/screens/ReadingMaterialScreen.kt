@@ -75,8 +75,9 @@ fun ReadingMaterialScreen(
 
     // Log section entrance & dwell tracking & reset scroll position to top
     LaunchedEffect(selectedSectionIndex) {
-        listState.scrollToItem(0)
         tracker.onEnterSection(currentSection.id, currentSection.title)
+        kotlinx.coroutines.delay(100) // Allow recomposition to finish
+        listState.animateScrollToItem(0)
     }
 
     DisposableEffect(Unit) {
@@ -251,10 +252,15 @@ fun ReadingMaterialScreen(
                             currentSection.videoUrl?.let { url ->
                                 YouTubeVideoCard(
                                     videoTitle = currentSection.videoTitle ?: "Photosynthesis Video",
-                                    videoUrl = url
-                                ) { title, targetUrl ->
-                                    tracker.onMediaInteraction("VIDEO", title, "Launched YouTube $targetUrl")
-                                }
+                                    videoUrl = url,
+                                    onVideoClicked = { title, targetUrl ->
+                                        tracker.onMediaInteraction("VIDEO", title, "Launched YouTube $targetUrl")
+                                    },
+                                    onPlayStateChanged = { title, isPlaying ->
+                                        val action = if (isPlaying) "Played Video" else "Paused Video"
+                                        tracker.onMediaInteraction("VIDEO", title, action)
+                                    }
+                                )
                             }
                         }
                     }

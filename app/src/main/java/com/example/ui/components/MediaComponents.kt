@@ -60,7 +60,8 @@ import java.util.regex.Pattern
 fun YouTubeVideoCard(
     videoTitle: String,
     videoUrl: String,
-    onVideoClicked: (title: String, url: String) -> Unit
+    onVideoClicked: (title: String, url: String) -> Unit,
+    onPlayStateChanged: ((title: String, isPlaying: Boolean) -> Unit)? = null
 ) {
     var isPlaying by remember { mutableStateOf(false) }
 
@@ -80,6 +81,8 @@ fun YouTubeVideoCard(
                 if (playing) {
                     YouTubePlayer(
                         videoUrl = videoUrl,
+                        onPlay = { onPlayStateChanged?.invoke(videoTitle, true) },
+                        onPause = { onPlayStateChanged?.invoke(videoTitle, false) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(200.dp)
@@ -185,6 +188,8 @@ fun YouTubeVideoCard(
 @Composable
 fun YouTubePlayer(
     videoUrl: String,
+    onPlay: () -> Unit,
+    onPause: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val videoId = remember(videoUrl) { extractVideoId(videoUrl) ?: "sQK3Yr4Sc_U" }
@@ -202,13 +207,39 @@ fun YouTubePlayer(
             </style>
         </head>
         <body>
-            <div class="iframe-container">
-                <iframe 
-                    src="https://www.youtube.com/embed/$videoId?autoplay=1&playsinline=1&rel=0&enablejsapi=1" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                    allowfullscreen>
-                </iframe>
-            </div>
+            <div id="player" class="iframe-container"></div>
+            <script>
+                var tag = document.createElement('script');
+                tag.src = "https://www.youtube.com/iframe_api";
+                var firstScriptTag = document.getElementsByTagName('script')[0];
+                firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+                var player;
+                function onYouTubeIframeAPIReady() {
+                    player = new YT.Player('player', {
+                        height: '100%',
+                        width: '100%',
+                        videoId: '$videoId',
+                        playerVars: {
+                            'autoplay': 1,
+                            'playsinline': 1,
+                            'rel': 0,
+                            'enablejsapi': 1
+                        },
+                        events: {
+                            'onStateChange': onPlayerStateChange
+                        }
+                    });
+                }
+
+                function onPlayerStateChange(event) {
+                    if (event.data == YT.PlayerState.PLAYING) {
+                        if (window.Android) window.Android.onPlay();
+                    } else if (event.data == YT.PlayerState.PAUSED) {
+                        if (window.Android) window.Android.onPause();
+                    }
+                }
+            </script>
         </body>
         </html>
         """.trimIndent()
@@ -231,6 +262,12 @@ fun YouTubePlayer(
                 settings.mixedContentMode = android.webkit.WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
                 webChromeClient = WebChromeClient()
                 webViewClient = WebViewClient()
+                addJavascriptInterface(object : Any() {
+                    @android.webkit.JavascriptInterface
+                    fun onPlay() { onPlay() }
+                    @android.webkit.JavascriptInterface
+                    fun onPause() { onPause() }
+                }, "Android")
                 loadDataWithBaseURL("https://www.youtube.com", htmlContent, "text/html", "UTF-8", null)
             }
         },

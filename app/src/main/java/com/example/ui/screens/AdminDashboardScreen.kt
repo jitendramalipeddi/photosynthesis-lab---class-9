@@ -371,18 +371,21 @@ fun AdminDashboardScreen(
         }
     }
 
-    // Modal Export Dialog when triggered
-    exportFormat?.let { format ->
-        val exportString = when (format) {
-            "JSON" -> repository.exportToJsonString(allEvents)
-            else -> repository.exportToCsvString(allEvents)
+    val context = androidx.compose.ui.platform.LocalContext.current
+    androidx.compose.runtime.LaunchedEffect(exportFormat) {
+        exportFormat?.let { format ->
+            val exportString = when (format) {
+                "JSON" -> repository.exportToJsonString(allEvents)
+                else -> repository.exportToCsvString(allEvents)
+            }
+            val savedLocation = com.example.ui.components.saveFileToDownloads(context, format, exportString)
+            if (savedLocation != null) {
+                android.widget.Toast.makeText(context, "Saved directly to Downloads: $savedLocation", android.widget.Toast.LENGTH_LONG).show()
+            } else {
+                android.widget.Toast.makeText(context, "Failed to save file.", android.widget.Toast.LENGTH_SHORT).show()
+            }
+            exportFormat = null
         }
-
-        ClickstreamExportDialog(
-            exportType = format,
-            exportContent = exportString,
-            onDismiss = { exportFormat = null }
-        )
     }
 }
 
