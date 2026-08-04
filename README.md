@@ -1,22 +1,63 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# Photosynthesis Lab - Class 9
 
-# Run and deploy your AI Studio app
+Welcome to the **Photosynthesis Lab** Android application! This interactive educational app is designed specifically for Class 9 students to explore and understand the fascinating process of photosynthesis. 
 
-This contains everything you need to run your app locally.
+## 📖 About the Learning Material
+The app provides a comprehensive and engaging learning experience, breaking down complex biological concepts into easy-to-digest interactive modules. It aims to foster a deeper understanding of plant biology through varied content delivery methods.
 
-View your app in AI Studio: https://ai.studio/apps/0576d737-3339-47a2-81c4-99d5c971fc96
+### 🌟 Content Types Available
+* **Reading Material:** In-depth, easy-to-understand textual content explaining the fundamental concepts of photosynthesis.
+* **Flip Cards:** Interactive flashcards for quick revision and memorization of key terms and definitions.
+* **Media Interactions:** Engaging diagrams and visual aids (like chloroplast structure and the photosynthesis process) that users can interact with.
+* **YouTube Videos:** Curated educational videos integrated directly into the app for visual and auditory learning.
+* **Quizzes:** Interactive assessments to test knowledge and track learning progress.
 
-## Run Locally
+## 📊 Clickstream Data Analytics
+To better understand user engagement and improve the learning experience, this app implements comprehensive **Clickstream Data Capture**. 
+* The app tracks user interactions, screen views, time spent on specific modules, and quiz performances.
+* This data can be exported and analyzed to provide insights into how students interact with the educational material.
 
-**Prerequisites:**  [Android Studio](https://developer.android.com/studio)
+## 🔐 Authentication (Sample Demo)
+For demonstration purposes, the app includes a simplified login flow for both **User** and **Admin** roles.
+* **Note:** Currently, this is a sample implementation. **Any combination of username and password will work** to log in and explore the app's features.
 
+---
 
-1. Open Android Studio
-2. Select **Open** and choose the directory containing this project
-3. Allow Android Studio to fix any incompatibilities as it imports the project.
-4. Create a file named `.env` in the project directory and set `GEMINI_API_KEY` in that file to your Gemini API key (see `.env.example` for an example)
-5. Remove this line from the app's `build.gradle.kts` file: `signingConfig = signingConfigs.getByName("debugConfig")`
-6. Run the app on an emulator or physical device
-7. If you have already published your app in AI Studio, please [request upload key reset](https://support.google.com/googleplay/android-developer/answer/9842756#zippy=%2Crequest-an-upload-key-reset) in Google Play Console.
+## 🛠️ Tech Stack
+This application is built using modern Android development practices and technologies:
+* **Language:** [Kotlin](https://kotlinlang.org/) - The primary programming language for Android development.
+* **UI Toolkit:** [Jetpack Compose](https://developer.android.com/jetpack/compose) - Android's modern toolkit for building native UI in a declarative manner.
+* **Architecture:** Modern Android Architecture 
+* **IDE:** Android Studio.
+
+---
+
+## 🚀 How to Run the Project Locally
+
+If you want to view the source code or contribute to the project, follow these steps to run the app in your local environment:
+
+### Prerequisites
+1. Download and install the latest version of [Android Studio](https://developer.android.com/studio).
+2. Ensure you have Git installed on your system.
+
+### Steps to Run
+1. **Download the Code:**
+   * Download the source code as a ZIP file and extract it, or clone the repository if it's hosted on Git.
+2. **Open in Android Studio:**
+   * Launch Android Studio.
+   * Click on **File > Open** (or "Open an existing Android Studio project" from the welcome screen).
+   * Navigate to the folder where you extracted the code and select the root directory (`photosynthesis-lab---class-9`).
+   * Wait for Android Studio to sync the project and download all necessary Gradle dependencies.
+3. **Run the App:**
+   * Once the Gradle sync is complete, select your target device (an Android Emulator or a physical device connected via USB with USB Debugging enabled) from the device drop-down menu in the toolbar.
+   * Click the **Run** button (green play icon) or press `Shift + F10`.
+   * The app will build and launch on your selected device.
+
+---
+
+## 📥 Download the APK
+If you just want to install and try out the app on your Android device without building it from source, you can download the latest APK file from the Google Drive link below:
+
+🔗 **[Download APK Here]** *(Replace this text with your actual Google Drive link)*
+
+*Note: You may need to enable "Install unknown apps" from your device settings to install the APK directly.*
