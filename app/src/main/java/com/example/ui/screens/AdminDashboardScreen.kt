@@ -76,11 +76,16 @@ fun AdminDashboardScreen(
     var exportFormat by remember { mutableStateOf<String?> (null) } // "CSV" or "JSON" or null
 
     val distinctStudents = remember(allEvents) {
-        listOf("ALL") + allEvents.map { it.username }.distinct().sorted()
+        listOf("ALL") + allEvents
+            .filter { it.userRole == com.example.model.UserRole.STUDENT.name }
+            .map { it.username }
+            .distinct()
+            .sorted()
     }
 
     val filteredEvents = remember(allEvents, selectedFilter, selectedStudent) {
         allEvents.filter { 
+            it.userRole == com.example.model.UserRole.STUDENT.name &&
             (selectedFilter == "ALL" || it.eventType == selectedFilter) &&
             (selectedStudent == "ALL" || it.username == selectedStudent)
         }
@@ -245,8 +250,9 @@ fun AdminDashboardScreen(
                     "ALL",
                     ClickstreamEventTypes.LOGIN,
                     ClickstreamEventTypes.READING_DWELL_TIME,
-                    ClickstreamEventTypes.QUESTION_RESPONSE_LATENCY,
-                    ClickstreamEventTypes.MEDIA_INTERACTION,
+                    ClickstreamEventTypes.VIDEO_PLAYED,
+                    ClickstreamEventTypes.VIDEO_PAUSED,
+                    ClickstreamEventTypes.VIDEO_SKIPPED,
                     ClickstreamEventTypes.QUIZ_SUBMIT
                 )
 
@@ -389,6 +395,10 @@ private fun EventItemCard(event: ClickstreamEntity) {
                         ClickstreamEventTypes.READING_DWELL_TIME -> Color(0xFF2E7D32)
                         ClickstreamEventTypes.QUESTION_RESPONSE_LATENCY -> Color(0xFFD97706)
                         ClickstreamEventTypes.QUIZ_SUBMIT -> Color(0xFF7C3AED)
+                        ClickstreamEventTypes.VIDEO_PLAYED -> Color(0xFFD32F2F)
+                        ClickstreamEventTypes.VIDEO_PAUSED -> Color(0xFFF97316)
+                        ClickstreamEventTypes.VIDEO_SKIPPED -> Color(0xFF8B5CF6)
+                        ClickstreamEventTypes.VIDEO_ENDED -> Color(0xFF10B981)
                         else -> Color(0xFF475569)
                     },
                     shape = RoundedCornerShape(6.dp)

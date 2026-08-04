@@ -74,7 +74,7 @@ fun PhotosynthesisApp(tracker: ClickstreamTracker) {
                         currentScreen = ScreenState.QUIZ
                     },
                     onLogoutClicked = {
-                        tracker.logEvent("LOGOUT", "reading_screen", metadata = "User logged out")
+                        tracker.onLogout("reading_screen")
                         currentScreen = ScreenState.LOGIN
                     }
                 )
@@ -96,7 +96,7 @@ fun PhotosynthesisApp(tracker: ClickstreamTracker) {
                 AdminDashboardScreen(
                     tracker = tracker,
                     onLogoutClicked = {
-                        tracker.logEvent("LOGOUT", "admin_dashboard", metadata = "Admin logged out")
+                        tracker.onLogout("admin_dashboard")
                         currentScreen = ScreenState.LOGIN
                     }
                 )

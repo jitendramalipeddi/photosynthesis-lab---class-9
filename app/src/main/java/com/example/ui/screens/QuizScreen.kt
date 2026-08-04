@@ -90,6 +90,11 @@ fun QuizScreen(
     val writtenLatencies = remember { mutableStateListOf<Long>() }
     val quizStartTimeMs = remember { mutableStateOf(System.currentTimeMillis()) }
 
+    // Record Overall Quiz Start
+    LaunchedEffect(Unit) {
+        tracker.onQuizStarted()
+    }
+
     // Record Question Start timestamp whenever question index changes
     LaunchedEffect(currentQuestionIndex) {
         if (!isQuizCompleted) {
@@ -451,6 +456,7 @@ fun QuizScreen(
 
                 Button(
                     onClick = {
+                        tracker.onQuizExit(totalScore)
                         tracker.onNavigation("reading_material_screen")
                         onBackToReading()
                     },

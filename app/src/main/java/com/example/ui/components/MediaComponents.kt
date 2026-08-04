@@ -3,9 +3,6 @@ package com.example.ui.components
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
-import android.webkit.WebChromeClient
-import android.webkit.WebView
-import android.webkit.WebViewClient
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
@@ -17,6 +14,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -38,6 +36,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,12 +47,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.example.model.VocabularyTerm
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstants
 import java.util.regex.Pattern
 
 @Composable
@@ -85,6 +89,7 @@ fun YouTubeVideoCard(
                         onPause = { onVideoAction?.invoke(videoTitle, "Paused Video") },
                         onEnded = { onVideoAction?.invoke(videoTitle, "Ended Video") },
                         onMoved = { time -> onVideoAction?.invoke(videoTitle, "Moved Video to ${time.toInt()}s") },
+                        onError = { error -> onVideoAction?.invoke(videoTitle, "Video Error: $error") },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(200.dp)
@@ -189,7 +194,6 @@ fun YouTubeVideoCard(
     }
 }
 
-@SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun YouTubePlayer(
     videoUrl: String,
@@ -197,112 +201,44 @@ fun YouTubePlayer(
     onPause: () -> Unit,
     onEnded: () -> Unit,
     onMoved: (Float) -> Unit,
+    onError: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val videoId = remember(videoUrl) { extractVideoId(videoUrl) ?: "sQK3Yr4Sc_U" }
-    val htmlContent = remember(videoId) {
-        """
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-            <style>
-                * { margin: 0; padding: 0; box-sizing: border-box; }
-                body, html { width: 100%; height: 100%; background-color: #000000; overflow: hidden; }
-                .iframe-container { position: relative; width: 100%; height: 100%; }
-                iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
-            </style>
-        </head>
-        <body>
-            <div id="player" class="iframe-container"></div>
-            <script>
-                var tag = document.createElement('script');
-                tag.src = "https://www.youtube.com/iframe_api";
-                var firstScriptTag = document.getElementsByTagName('script')[0];
-                firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
-                var player;
-                var lastTime = -1;
-                var checkInterval;
-                
-                function onYouTubeIframeAPIReady() {
-                    player = new YT.Player('player', {
-                        height: '100%',
-                        width: '100%',
-                        videoId: '$videoId',
-                        playerVars: {
-                            'autoplay': 1,
-                            'playsinline': 1,
-                            'rel': 0,
-                            'enablejsapi': 1
-                        },
-                        events: {
-                            'onStateChange': onPlayerStateChange,
-                            'onReady': onPlayerReady
-                        }
-                    });
-                }
-
-                function onPlayerReady(event) {
-                    checkInterval = setInterval(function() {
-                        if (player && player.getCurrentTime) {
-                            var currentTime = player.getCurrentTime();
-                            if (lastTime !== -1 && Math.abs(currentTime - lastTime) > 1.5) {
-                                if (window.Android) window.Android.onMoved(currentTime);
-                            }
-                            lastTime = currentTime;
-                        }
-                    }, 1000);
-                }
-
-                function onPlayerStateChange(event) {
-                    if (event.data == YT.PlayerState.PLAYING) {
-                        if (window.Android) window.Android.onPlay();
-                    } else if (event.data == YT.PlayerState.PAUSED) {
-                        if (window.Android) window.Android.onPause();
-                    } else if (event.data == YT.PlayerState.ENDED) {
-                        if (window.Android) window.Android.onEnded();
-                        if (checkInterval) clearInterval(checkInterval);
-                    }
-                }
-            </script>
-        </body>
-        </html>
-        """.trimIndent()
-    }
+    val lifecycleOwner = LocalLifecycleOwner.current
 
     AndroidView(
         modifier = modifier,
         factory = { context ->
-            WebView(context).apply {
-                layoutParams = android.view.ViewGroup.LayoutParams(
-                    android.view.ViewGroup.LayoutParams.MATCH_PARENT,
-                    android.view.ViewGroup.LayoutParams.MATCH_PARENT
-                )
-                settings.javaScriptEnabled = true
-                settings.domStorageEnabled = true
-                settings.mediaPlaybackRequiresUserGesture = false
-                settings.loadWithOverviewMode = true
-                settings.useWideViewPort = true
-                settings.allowFileAccess = true
-                settings.mixedContentMode = android.webkit.WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
-                webChromeClient = WebChromeClient()
-                webViewClient = WebViewClient()
-                addJavascriptInterface(object : Any() {
-                    @android.webkit.JavascriptInterface
-                    fun onPlay() { onPlay() }
-                    @android.webkit.JavascriptInterface
-                    fun onPause() { onPause() }
-                    @android.webkit.JavascriptInterface
-                    fun onEnded() { onEnded() }
-                    @android.webkit.JavascriptInterface
-                    fun onMoved(time: Float) { onMoved(time) }
-                }, "Android")
-                loadDataWithBaseURL("https://www.youtube.com", htmlContent, "text/html", "UTF-8", null)
+            YouTubePlayerView(context).apply {
+                lifecycleOwner.lifecycle.addObserver(this)
+                addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
+                    override fun onReady(youTubePlayer: YouTubePlayer) {
+                        youTubePlayer.loadVideo(videoId, 0f)
+                    }
+
+                    override fun onStateChange(youTubePlayer: YouTubePlayer, state: PlayerConstants.PlayerState) {
+                        when (state) {
+                            PlayerConstants.PlayerState.PLAYING -> onPlay()
+                            PlayerConstants.PlayerState.PAUSED -> onPause()
+                            PlayerConstants.PlayerState.ENDED -> onEnded()
+                            else -> {}
+                        }
+                    }
+
+                    override fun onCurrentSecond(youTubePlayer: YouTubePlayer, second: Float) {
+                        onMoved(second)
+                    }
+
+                    override fun onError(youTubePlayer: YouTubePlayer, error: PlayerConstants.PlayerError) {
+                        onError(error.ordinal)
+                    }
+                })
             }
         },
-        update = {
-            // Intentionally empty to prevent re-triggering loadDataWithBaseURL on recompositions
+        onRelease = { view ->
+            lifecycleOwner.lifecycle.removeObserver(view)
+            view.release()
         }
     )
 }
