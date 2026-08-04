@@ -25,6 +25,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.PlayCircle
 import androidx.compose.material.icons.filled.Quiz
 import androidx.compose.material3.Button
@@ -75,8 +76,9 @@ fun ReadingMaterialScreen(
 
     // Log section entrance & dwell tracking & reset scroll position to top
     LaunchedEffect(selectedSectionIndex) {
-        listState.scrollToItem(0)
         tracker.onEnterSection(currentSection.id, currentSection.title)
+        kotlinx.coroutines.delay(100) // Allow recomposition to finish
+        listState.animateScrollToItem(0)
     }
 
     DisposableEffect(Unit) {
@@ -136,6 +138,14 @@ fun ReadingMaterialScreen(
                             text = "Student: ${tracker.getCurrentUsername()} • Session: ${tracker.getCurrentSessionId()}",
                             color = Color(0xFF94A3B8),
                             fontSize = 11.sp
+                        )
+                    }
+
+                    androidx.compose.material3.IconButton(onClick = onLogoutClicked) {
+                        Icon(
+                            imageVector = Icons.Default.ExitToApp,
+                            contentDescription = "Logout",
+                            tint = Color(0xFFEF5350)
                         )
                     }
                 }
@@ -251,10 +261,14 @@ fun ReadingMaterialScreen(
                             currentSection.videoUrl?.let { url ->
                                 YouTubeVideoCard(
                                     videoTitle = currentSection.videoTitle ?: "Photosynthesis Video",
-                                    videoUrl = url
-                                ) { title, targetUrl ->
-                                    tracker.onMediaInteraction("VIDEO", title, "Launched YouTube $targetUrl")
-                                }
+                                    videoUrl = url,
+                                    onVideoClicked = { title, targetUrl ->
+                                        tracker.onVideoInteraction(title, "Launched YouTube $targetUrl")
+                                    },
+                                    onVideoAction = { title, action ->
+                                        tracker.onVideoInteraction(title, action)
+                                    }
+                                )
                             }
                         }
                     }

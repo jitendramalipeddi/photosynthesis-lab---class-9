@@ -164,7 +164,7 @@ fun ClickstreamExportDialog(
     }
 }
 
-private fun saveFileToDownloads(
+fun saveFileToDownloads(
     context: Context,
     exportType: String,
     content: String

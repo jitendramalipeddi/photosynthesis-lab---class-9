@@ -23,6 +23,12 @@ object ClickstreamEventTypes {
     const val READING_SECTION_VIEW = "READING_SECTION_VIEW"
     const val READING_DWELL_TIME = "READING_DWELL_TIME"
     const val MEDIA_INTERACTION = "MEDIA_INTERACTION"
+    const val VIDEO_PLAYED = "VIDEO_PLAYED"
+    const val VIDEO_PAUSED = "VIDEO_PAUSED"
+    const val VIDEO_SKIPPED = "VIDEO_SKIPPED"
+    const val VIDEO_ENDED = "VIDEO_ENDED"
+    const val VIDEO_ERROR = "VIDEO_ERROR"
+    const val VIDEO_LAUNCHED = "VIDEO_LAUNCHED"
     const val VOCAB_CARD_FLIP = "VOCAB_CARD_FLIP"
     const val QUIZ_START = "QUIZ_START"
     const val QUESTION_VIEW = "QUESTION_VIEW"
@@ -30,6 +36,7 @@ object ClickstreamEventTypes {
     const val QUESTION_RESPONSE_LATENCY = "QUESTION_RESPONSE_LATENCY"
     const val QUESTION_FEEDBACK_VIEW = "QUESTION_FEEDBACK_VIEW"
     const val QUIZ_SUBMIT = "QUIZ_SUBMIT"
+    const val QUIZ_FINISHED = "QUIZ_FINISHED"
     const val NAVIGATION_CLICK = "NAVIGATION_CLICK"
     const val EXPORT_DATA_CLICK = "EXPORT_DATA_CLICK"
     const val LOGOUT = "LOGOUT"
@@ -146,6 +153,24 @@ class ClickstreamTracker private constructor(context: Context) {
         )
     }
 
+    fun onVideoInteraction(videoTitle: String, action: String) {
+        val eventType = when {
+            action.contains("Played", ignoreCase = true) -> ClickstreamEventTypes.VIDEO_PLAYED
+            action.contains("Paused", ignoreCase = true) -> ClickstreamEventTypes.VIDEO_PAUSED
+            action.contains("Ended", ignoreCase = true) -> ClickstreamEventTypes.VIDEO_ENDED
+            action.contains("Moved", ignoreCase = true) -> ClickstreamEventTypes.VIDEO_SKIPPED
+            action.contains("Error", ignoreCase = true) -> ClickstreamEventTypes.VIDEO_ERROR
+            action.contains("Launched", ignoreCase = true) -> ClickstreamEventTypes.VIDEO_LAUNCHED
+            else -> ClickstreamEventTypes.MEDIA_INTERACTION
+        }
+
+        logEvent(
+            eventType = eventType,
+            componentId = "youtube_video",
+            metadata = "$action: '$videoTitle'"
+        )
+    }
+
     fun onVocabCardFlipped(term: String, isFlipped: Boolean) {
         logEvent(
             eventType = ClickstreamEventTypes.VOCAB_CARD_FLIP,
@@ -207,6 +232,13 @@ class ClickstreamTracker private constructor(context: Context) {
             metadata = "Score: $score/$totalQuestions | MCQ Latency Avg: ${mcqAvgLatencyMs/1000.0}s | Written Latency Avg: ${writtenAvgLatencyMs/1000.0}s"
         )
 
+        // Also log that the quiz is technically 'finished'
+        logEvent(
+            eventType = ClickstreamEventTypes.QUIZ_FINISHED,
+            componentId = "quiz_summary",
+            metadata = "User finished the quiz with score $score"
+        )
+
         val formattedDate = dateFormat.format(Date())
         val quizResult = QuizResultEntity(
             sessionId = currentSessionId,
@@ -226,12 +258,37 @@ class ClickstreamTracker private constructor(context: Context) {
         }
     }
 
+    fun onQuizStarted() {
+        logEvent(
+            eventType = ClickstreamEventTypes.QUIZ_START,
+            componentId = "quiz_screen",
+            metadata = "User started the quiz session"
+        )
+    }
+
+    fun onQuizExit(finalScore: Int) {
+        logEvent(
+            eventType = ClickstreamEventTypes.QUIZ_FINISHED,
+            componentId = "quiz_result_screen",
+            metadata = "User exited the quiz result screen. Final Score: $finalScore"
+        )
+    }
+
     fun onNavigation(destination: String) {
         onLeaveCurrentSection()
         logEvent(
             eventType = ClickstreamEventTypes.NAVIGATION_CLICK,
             componentId = "nav_$destination",
             metadata = "Navigated to $destination"
+        )
+    }
+
+    fun onLogout(componentId: String) {
+        onLeaveCurrentSection()
+        logEvent(
+            eventType = ClickstreamEventTypes.LOGOUT,
+            componentId = componentId,
+            metadata = "User initiated logout"
         )
     }
 
