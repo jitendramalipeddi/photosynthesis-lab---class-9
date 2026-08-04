@@ -14,8 +14,16 @@ The app provides a comprehensive and engaging learning experience, breaking down
 
 ## 📊 Clickstream Data Analytics
 To better understand user engagement and improve the learning experience, this app implements comprehensive **Clickstream Data Capture**. 
-* The app tracks user interactions, screen views, time spent on specific modules, and quiz performances.
-* This data can be exported and analyzed to provide insights into how students interact with the educational material.
+The following specific clickstream events are captured:
+* `LOGIN` & `LOGOUT`: Tracks user sessions.
+* `NAVIGATION_CLICK`: Tracks general app navigation between screens.
+* `READING_SECTION_VIEW` & `READING_DWELL_TIME`: Measures engagement and time spent with reading materials.
+* `MEDIA_INTERACTION`: Tracks interaction with interactive diagrams.
+* `VOCAB_CARD_FLIP`: Captures engagement with flip cards.
+* **Video Analytics:** `VIDEO_LAUNCHED`, `VIDEO_PLAYED`, `VIDEO_PAUSED`, `VIDEO_SKIPPED`, `VIDEO_ENDED`, `VIDEO_ERROR`.
+* **Quiz Analytics:** `QUIZ_START`, `QUESTION_VIEW`, `QUESTION_ANSWER_SELECT`, `QUESTION_RESPONSE_LATENCY`, `QUIZ_SUBMIT`, `QUIZ_FINISHED`.
+
+This data can be exported in CSV or JSON format and analyzed by Admins to provide insights into how students interact with the educational material.
 
 ## 🔐 Authentication (Sample Demo)
 For demonstration purposes, the app includes a simplified login flow for both **User** and **Admin** roles.
