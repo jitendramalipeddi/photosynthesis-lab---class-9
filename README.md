@@ -66,6 +66,6 @@ If you want to view the source code or contribute to the project, follow these s
 ## 📥 Download the APK
 If you just want to install and try out the app on your Android device without building it from source, you can download the latest APK file from the Google Drive link below:
 
-🔗 **[Download APK Here]** *(Replace this text with your actual Google Drive link)*
+🔗 **[Download APK Here]** *https://drive.google.com/file/d/1b99fHgNYm2JnCYwukFfJln76FH4I-bbB/view?usp=sharing*
 
 *Note: You may need to enable "Install unknown apps" from your device settings to install the APK directly.*
