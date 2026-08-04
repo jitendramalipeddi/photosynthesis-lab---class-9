@@ -47,7 +47,7 @@ object PhotosynthesisData {
                 "Energy Compounds Formed: ATP (Adenosine Triphosphate) & NADPH.",
                 "Oxygen Release: Oxygen gas diffuses out of the leaf through stomata."
             ),
-            videoUrl = "https://www.youtube.com/watch?v=g78utcLQrJ4",
+            videoUrl = "https://www.youtube.com/watch?v=WMfWXVEisjw",
             videoTitle = "Light Reactions & Photolysis Step-by-Step Animation",
             mediaType = "VIDEO"
         ),
@@ -63,7 +63,7 @@ object PhotosynthesisData {
                 "Output: Glucose (C₆H₁₂O₆), stored as starch in plant tissues.",
                 "Regeneration: ADP and NADP⁺ return to light reactions to repeat the cycle."
             ),
-            videoUrl = "https://www.youtube.com/watch?v=0UzMaoGkKaM",
+            videoUrl = "https://www.youtube.com/watch?v=0UzMaoaXKaM",
             videoTitle = "Calvin Cycle & Carbon Fixation Explained for Class 9",
             mediaType = "ANIMATION"
         ),

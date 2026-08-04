@@ -256,8 +256,7 @@ fun ReadingMaterialScreen(
                                     onVideoClicked = { title, targetUrl ->
                                         tracker.onMediaInteraction("VIDEO", title, "Launched YouTube $targetUrl")
                                     },
-                                    onPlayStateChanged = { title, isPlaying ->
-                                        val action = if (isPlaying) "Played Video" else "Paused Video"
+                                    onVideoAction = { title, action ->
                                         tracker.onMediaInteraction("VIDEO", title, action)
                                     }
                                 )

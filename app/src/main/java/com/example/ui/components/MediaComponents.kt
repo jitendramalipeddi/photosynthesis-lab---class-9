@@ -61,7 +61,7 @@ fun YouTubeVideoCard(
     videoTitle: String,
     videoUrl: String,
     onVideoClicked: (title: String, url: String) -> Unit,
-    onPlayStateChanged: ((title: String, isPlaying: Boolean) -> Unit)? = null
+    onVideoAction: ((title: String, action: String) -> Unit)? = null
 ) {
     var isPlaying by remember { mutableStateOf(false) }
 
@@ -81,8 +81,10 @@ fun YouTubeVideoCard(
                 if (playing) {
                     YouTubePlayer(
                         videoUrl = videoUrl,
-                        onPlay = { onPlayStateChanged?.invoke(videoTitle, true) },
-                        onPause = { onPlayStateChanged?.invoke(videoTitle, false) },
+                        onPlay = { onVideoAction?.invoke(videoTitle, "Played Video") },
+                        onPause = { onVideoAction?.invoke(videoTitle, "Paused Video") },
+                        onEnded = { onVideoAction?.invoke(videoTitle, "Ended Video") },
+                        onMoved = { time -> onVideoAction?.invoke(videoTitle, "Moved Video to ${time.toInt()}s") },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(200.dp)
@@ -173,7 +175,10 @@ fun YouTubeVideoCard(
                 }
             } else {
                 OutlinedButton(
-                    onClick = { isPlaying = false },
+                    onClick = { 
+                        isPlaying = false
+                        onVideoAction?.invoke(videoTitle, "Closed Video")
+                    },
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -190,6 +195,8 @@ fun YouTubePlayer(
     videoUrl: String,
     onPlay: () -> Unit,
     onPause: () -> Unit,
+    onEnded: () -> Unit,
+    onMoved: (Float) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val videoId = remember(videoUrl) { extractVideoId(videoUrl) ?: "sQK3Yr4Sc_U" }
@@ -215,6 +222,9 @@ fun YouTubePlayer(
                 firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
                 var player;
+                var lastTime = -1;
+                var checkInterval;
+                
                 function onYouTubeIframeAPIReady() {
                     player = new YT.Player('player', {
                         height: '100%',
@@ -227,9 +237,22 @@ fun YouTubePlayer(
                             'enablejsapi': 1
                         },
                         events: {
-                            'onStateChange': onPlayerStateChange
+                            'onStateChange': onPlayerStateChange,
+                            'onReady': onPlayerReady
                         }
                     });
+                }
+
+                function onPlayerReady(event) {
+                    checkInterval = setInterval(function() {
+                        if (player && player.getCurrentTime) {
+                            var currentTime = player.getCurrentTime();
+                            if (lastTime !== -1 && Math.abs(currentTime - lastTime) > 1.5) {
+                                if (window.Android) window.Android.onMoved(currentTime);
+                            }
+                            lastTime = currentTime;
+                        }
+                    }, 1000);
                 }
 
                 function onPlayerStateChange(event) {
@@ -237,6 +260,9 @@ fun YouTubePlayer(
                         if (window.Android) window.Android.onPlay();
                     } else if (event.data == YT.PlayerState.PAUSED) {
                         if (window.Android) window.Android.onPause();
+                    } else if (event.data == YT.PlayerState.ENDED) {
+                        if (window.Android) window.Android.onEnded();
+                        if (checkInterval) clearInterval(checkInterval);
                     }
                 }
             </script>
@@ -267,6 +293,10 @@ fun YouTubePlayer(
                     fun onPlay() { onPlay() }
                     @android.webkit.JavascriptInterface
                     fun onPause() { onPause() }
+                    @android.webkit.JavascriptInterface
+                    fun onEnded() { onEnded() }
+                    @android.webkit.JavascriptInterface
+                    fun onMoved(time: Float) { onMoved(time) }
                 }, "Android")
                 loadDataWithBaseURL("https://www.youtube.com", htmlContent, "text/html", "UTF-8", null)
             }

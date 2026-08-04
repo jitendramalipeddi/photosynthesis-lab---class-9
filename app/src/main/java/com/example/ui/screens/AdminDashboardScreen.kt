@@ -72,11 +72,18 @@ fun AdminDashboardScreen(
     )
 
     var selectedFilter by remember { mutableStateOf("ALL") }
-    var exportFormat by remember { mutableStateOf<String?>(null) } // "CSV" or "JSON" or null
+    var selectedStudent by remember { mutableStateOf("ALL") }
+    var exportFormat by remember { mutableStateOf<String?> (null) } // "CSV" or "JSON" or null
 
-    val filteredEvents = remember(allEvents, selectedFilter) {
-        if (selectedFilter == "ALL") allEvents
-        else allEvents.filter { it.eventType == selectedFilter }
+    val distinctStudents = remember(allEvents) {
+        listOf("ALL") + allEvents.map { it.username }.distinct().sorted()
+    }
+
+    val filteredEvents = remember(allEvents, selectedFilter, selectedStudent) {
+        allEvents.filter { 
+            (selectedFilter == "ALL" || it.eventType == selectedFilter) &&
+            (selectedStudent == "ALL" || it.username == selectedStudent)
+        }
     }
 
     Column(
@@ -145,87 +152,7 @@ fun AdminDashboardScreen(
         ) {
             item { Spacer(modifier = Modifier.height(4.dp)) }
 
-            // Summary Analytics Metrics Grid
-            item {
-                Text(
-                    text = "📊 Cognitive Engagement Summary",
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        StatMetricCard(
-                            title = "Total Sessions",
-                            value = "${summary.totalSessions}",
-                            subtitle = "Distinct Students",
-                            accentColor = Color(0xFF38BDF8),
-                            modifier = Modifier.weight(1f)
-                        )
-                        StatMetricCard(
-                            title = "Captured Events",
-                            value = "${summary.totalEventsCount}",
-                            subtitle = "Clickstream Logs",
-                            accentColor = Color(0xFF4CAF50),
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        StatMetricCard(
-                            title = "Avg Dwell Time",
-                            value = "${summary.avgReadingDwellTimeSec}s",
-                            subtitle = "Per Reading Topic",
-                            accentColor = Color(0xFFFFD54F),
-                            modifier = Modifier.weight(1f)
-                        )
-                        StatMetricCard(
-                            title = "MCQ Latency",
-                            value = "${summary.avgMcqLatencySec}s",
-                            subtitle = "Response Time",
-                            accentColor = Color(0xFF00ADB5),
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        StatMetricCard(
-                            title = "Written Latency",
-                            value = "${summary.avgWrittenLatencySec}s",
-                            subtitle = "Single Word Input",
-                            accentColor = Color(0xFFFF7043),
-                            modifier = Modifier.weight(1f)
-                        )
-                        StatMetricCard(
-                            title = "Top Engaged Topic",
-                            value = summary.mostEngagedSection.take(16),
-                            subtitle = "Highest Dwell",
-                            accentColor = Color(0xFFA5D6A7),
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
-                }
-            }
-
-            // Interactive Graphical Trend Charts (Bar & Line Graphs)
-            item {
-                QuizPerformanceTrendChart(
-                    quizResults = allQuizResults,
-                    clickstreamEvents = allEvents
-                )
-            }
+            // Dashboard sections removed per request
 
             // Export Data Action Bar
             item {
@@ -332,6 +259,38 @@ fun AdminDashboardScreen(
                             selected = isSel,
                             onClick = { selectedFilter = filter },
                             label = { Text(text = filter.replace("QUESTION_", "Q_").replace("READING_", "READ_"), fontSize = 11.sp) },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = Color(0xFF0284C7),
+                                selectedLabelColor = Color.White,
+                                containerColor = Color(0xFF1E293B),
+                                labelColor = Color(0xFF94A3B8)
+                            ),
+                            border = null,
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Text(
+                    text = "Filter by Student:",
+                    color = Color(0xFF81C784),
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    items(distinctStudents) { student ->
+                        val isSel = selectedStudent == student
+                        FilterChip(
+                            selected = isSel,
+                            onClick = { selectedStudent = student },
+                            label = { Text(text = student, fontSize = 11.sp) },
                             colors = FilterChipDefaults.filterChipColors(
                                 selectedContainerColor = Color(0xFF0284C7),
                                 selectedLabelColor = Color.White,

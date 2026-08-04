@@ -174,35 +174,26 @@ fun InteractiveChloroplastDiagram(
                     )
                 }
 
-                // Interactive Overlay Labels
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .padding(8.dp)
-                ) {
-                    PartChip("Outer Membrane", selectedPart == "Outer Membrane") {
-                        selectedPart = "Outer Membrane"
-                        onDiagramClick("outer_membrane")
-                    }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                PartChip("Outer Membrane", selectedPart == "Outer Membrane") {
+                    selectedPart = "Outer Membrane"
+                    onDiagramClick("outer_membrane")
                 }
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                ) {
-                    PartChip("Thylakoids (Grana)", selectedPart == "Thylakoids (Grana)") {
-                        selectedPart = "Thylakoids (Grana)"
-                        onDiagramClick("thylakoids")
-                    }
+                PartChip("Thylakoids (Grana)", selectedPart == "Thylakoids (Grana)") {
+                    selectedPart = "Thylakoids (Grana)"
+                    onDiagramClick("thylakoids")
                 }
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(8.dp)
-                ) {
-                    PartChip("Stroma Fluid", selectedPart == "Stroma Fluid") {
-                        selectedPart = "Stroma Fluid"
-                        onDiagramClick("stroma")
-                    }
+                PartChip("Stroma Fluid", selectedPart == "Stroma Fluid") {
+                    selectedPart = "Stroma Fluid"
+                    onDiagramClick("stroma")
                 }
             }
 

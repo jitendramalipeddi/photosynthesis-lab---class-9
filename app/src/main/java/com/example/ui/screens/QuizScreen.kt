@@ -346,30 +346,7 @@ fun QuizScreen(
 
                                 Spacer(modifier = Modifier.weight(1f))
 
-                                // Latency Metric Tag
-                                Surface(
-                                    color = Color.Black.copy(alpha = 0.5f),
-                                    shape = RoundedCornerShape(8.dp)
-                                ) {
-                                    Row(
-                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Speed,
-                                            contentDescription = null,
-                                            tint = Color(0xFFFFD54F),
-                                            modifier = Modifier.size(12.dp)
-                                        )
-                                        Spacer(modifier = Modifier.width(4.dp))
-                                        Text(
-                                            text = "${lastLatencyMs / 1000.0}s latency",
-                                            color = Color.White,
-                                            fontSize = 10.sp,
-                                            fontWeight = FontWeight.Bold
-                                        )
-                                    }
-                                }
+                                // Latency UI removed to hide from user
                             }
 
                             Spacer(modifier = Modifier.height(8.dp))
@@ -468,39 +445,7 @@ fun QuizScreen(
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                // Cognitive Metrics Breakdown
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B))
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text(
-                            text = "🧠 Cognitive Engagement Insights",
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 14.sp
-                        )
-
-                        Spacer(modifier = Modifier.height(10.dp))
-
-                        val mcqAvg = if (mcqLatencies.isNotEmpty()) mcqLatencies.average() / 1000.0 else 0.0
-                        val writtenAvg = if (writtenLatencies.isNotEmpty()) writtenLatencies.average() / 1000.0 else 0.0
-
-                        MetricRow("MCQ Response Latency (Avg):", "${(mcqAvg * 10).toInt() / 10.0}s")
-                        MetricRow("Written Single Word Latency (Avg):", "${(writtenAvg * 10).toInt() / 10.0}s")
-                        MetricRow("Clickstream Data Logged:", "10+ events persisted")
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        Text(
-                            text = "All clickstream events and response latencies have been saved to Room Database for Admin Analytics.",
-                            color = Color(0xFF94A3B8),
-                            fontSize = 11.sp,
-                            lineHeight = 15.sp
-                        )
-                    }
-                }
+                // Cognitive Metrics Breakdown (Hidden from user)
 
                 Spacer(modifier = Modifier.height(24.dp))
 
